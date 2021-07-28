@@ -12,7 +12,7 @@ app.get("/", (req, res) => {
 app.get("/client", async (req, res) => {
   try {
     const { data } = await api.get("client/status");
-    console.log(data);
+
     return res.send({
       started: data.started,
       uptime: data.uptime,
@@ -25,11 +25,10 @@ app.get("/client", async (req, res) => {
   }
 });
 
-app.get("/address/balennce/:address", async (req, res) => {
+app.get("/address/balance/:address", async (req, res) => {
   const { address } = req.params;
   try {
     const { data } = await api.get(`/address/balance/${address}`);
-    console.log(data);
     return res.send({
       address: data.address,
       received: data.received,
@@ -48,4 +47,16 @@ app.get("/address/balennce/:address", async (req, res) => {
     res.send({ error: error.message });
   }
 });
+
+app.get("/api/tx/:txid", async (req, res) => {
+  const { txid } = req.params;
+  try {
+    const { data } = await api.get(`/transaction/check/${txid}`);
+
+    res.send(data);
+  } catch (error) {
+    res.send({ error: error.message });
+  }
+});
+
 app.listen(5500, () => console.log("server up"));
