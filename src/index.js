@@ -5,10 +5,6 @@ const api = require("./api");
 
 app.use(express.json());
 
-app.get("/", (req, res) => {
-  res.json({ message: "todo ok" });
-});
-
 app.get("/client", async (req, res) => {
   try {
     const { data } = await api.get("client/status");
@@ -30,18 +26,14 @@ app.get("/address/balance/:address", async (req, res) => {
   try {
     const { data } = await api.get(`/address/balance/${address}`);
     return res.send({
-      address: data.address,
-      received: data.received,
-      sent: data.sent,
-      balance: {
-        total: data.balance.total,
-        locked: data.balance.locked,
-        unlocked: data.balance.unlocked,
-      },
-      unconfirmed: {
-        delta: data.unconfirmed.delta,
-        transactions: [],
-      },
+      addrStr: data.address,
+      balance: data.balance.total,
+      balanceSat: data.balance.total * 100000000,
+      totalReceived: data.received,
+      totalReceivedSat: data.sent * 100000000,
+      totalSent: data.sent,
+      totalSentSat: data.sent * 100000000,
+      transactions: data.unconfirmed.transactions,
     });
   } catch (error) {
     res.send({ error: error.message });
@@ -53,7 +45,20 @@ app.get("/api/tx/:txid", async (req, res) => {
   try {
     const { data } = await api.get(`/transaction/check/${txid}`);
 
-    res.send(data);
+    res.send({
+      txid: data.txid,
+      version: data.version,
+      size: data.size,
+      locktime: data.locktime,
+      blockhash: data.blockhash,
+      blockheight: data.blockheight,
+      confirmations: data.confirmations,
+      time: data.time,
+      blocktime: data.blocktime,
+      isCoinBase: data.isCoinBase,
+      vin: data.vin,
+      vout: data.vout,
+    });
   } catch (error) {
     res.send({ error: error.message });
   }
